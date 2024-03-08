@@ -38,7 +38,7 @@ impl Service {
             signers: vec![signer]
         })
     }
-    
+
     pub async fn get(client: &S3Client, owner: &Owner) -> Result<Self, Box<dyn Error>> {
         let model = Model::read(client, owner).await?;
         let signers = Self::get_signers(client, &model).await?;
@@ -54,11 +54,11 @@ impl Service {
     }
 
     pub async fn add_block(
-        &mut self, 
-        client: &S3Client, 
-        owner: &Owner, 
+        &mut self,
+        client: &S3Client,
+        owner: &Owner,
         block: &str
-    ) -> Result<&Self, Box<dyn Error>> { 
+    ) -> Result<&Self, Box<dyn Error>> {
         let mut blocks = self.blocks.clone();
         blocks.push(block.to_string());
         self.blocks = blocks;
@@ -86,23 +86,5 @@ impl Service {
             signers.push(signer);
         }
         Ok(signers)
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use std::env;
-    use tokio_test::assert_ok;
-    use super::{Service, super::super::super::{utils::S3Client, api::Owner}};
-
-    #[tokio::test]
-    async fn bully() {
-        env::set_var("AWS_PROFILE", "sandbox-mike");
-        let client = S3Client::new("us-east-2", "mytiki-sandbox-mike-ocean").await;
-        let owner = Owner::new("1234:abcd").unwrap();
-        
-        let metadata = Service::initialize(&client, None,  &owner).await;
-        
-        assert_ok!(metadata);
     }
 }

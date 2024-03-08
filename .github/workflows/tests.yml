@@ -38,3 +38,6 @@ jobs:
         with:
           name: test-results
           path: test-results.xml
+
+      - name: Cargo Dry Run
+        run: cargo publish --token ${{ secrets.CRATES_TOKEN }} --dry-run
