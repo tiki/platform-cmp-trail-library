@@ -1,6 +1,11 @@
 [package]
 name = "core-trail-storage"
+description = "Generic storage libaray for interacting with the raw mytiki.com trail assets."
 version = "0.0.1"
+repository = "https://github.com/tiki/core-trail-storage"
+homepage = "https://mytiki.com"
+readme = "README.md"
+license = "MIT"
 edition = "2021"
 
 [dependencies]
