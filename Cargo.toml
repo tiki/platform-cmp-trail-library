@@ -7,6 +7,7 @@ homepage = "https://mytiki.com"
 readme = "README.md"
 license = "MIT"
 edition = "2021"
+exclude = [".github/*"]
 
 [dependencies]
 aws-sdk-s3 = { version =  "1.17.0" , features = ["behavior-version-latest"] }

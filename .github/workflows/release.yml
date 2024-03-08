@@ -29,6 +29,9 @@ jobs:
           export CURRENT_VERSION=$(grep -m 1 'version = "' Cargo.toml | awk -F '"' '{print $2}')
           echo "current=$CURRENT_VERSION" >> $GITHUB_OUTPUT
 
+      - name: Cargo Publish
+        run: cargo publish --token ${{ secrets.CRATES_TOKEN }}
+
       - name: Create Release
         uses: ncipollo/release-action@v1
         with:
