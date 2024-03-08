@@ -1,5 +1,5 @@
 [package]
-name = "core-trail-storage"
+name = "mytiki-core-trail-storage"
 description = "Generic storage libaray for interacting with the raw mytiki.com trail assets."
 version = "0.1.0"
 repository = "https://github.com/tiki/core-trail-storage"
