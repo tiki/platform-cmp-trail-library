@@ -124,21 +124,3 @@ impl Model {
     pub fn transaction_root(&self) -> &str { &self.transaction_root }
     pub fn transactions(&self) -> &Vec<ModelTxn> { &self.transactions }
 }
-
-#[cfg(test)]
-mod tests {
-    use std::env;
-    use super::{Model, super::super::super::{api::Owner, utils::S3Client}};
-
-    #[tokio::test]
-    async fn bully() {
-        env::set_var("AWS_PROFILE", "sandbox-mike");
-        let client = S3Client::new("us-east-2", "mytiki-sandbox-mike-ocean").await;
-        let owner = Owner::new("1234:abcd").unwrap();
-        let id = "I-3qrn0vn1H0WaKdgeXQnMOEqanRuVpUnMMZE5aL3aQ";
-        
-        let res = Model::read(&client, &owner, &id).await;
-        let model = res.unwrap();
-        assert_eq!(id, model.id());
-    }
-}
