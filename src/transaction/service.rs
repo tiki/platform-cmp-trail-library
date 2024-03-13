@@ -9,6 +9,9 @@ use crate::{byte_helpers, compact_size, Owner, Signer};
 use chrono::Utc;
 use num_bigint::BigInt;
 use super::Model;
+use ring::rsa::KeyPair;
+use ring::signature;
+
 
 pub struct Service{
   address: String,
@@ -18,6 +21,14 @@ pub struct Service{
 
 #[allow(unused)]
 impl Service {
+
+  pub fn new(addr: String, sign: Signer, transaction: Option<Vec<Model>>) -> Service{
+    Service {
+      address: addr,
+      signer: sign,
+      transactions: Vec::new()
+    }
+  }
   
   pub fn add(
     &mut self,
@@ -81,4 +92,43 @@ impl Service {
         None => "providers/metadata.json".to_string()
     } 
   }
+
+  
 }
+
+#[cfg(test)]
+  mod tests {
+    use super::*;
+
+    fn generate_key_pair() -> KeyPair{
+      let rng = ring::rand::SystemRandom::new();
+      // RSA_PKCS1_2048_8192_SHA256
+
+      let pkcs8_bytes = signature::Ed25519KeyPair::generate_pkcs8(&rng).unwrap();
+      let pkcs8_slice: &[u8] = pkcs8_bytes.as_ref();
+      return KeyPair::from_pkcs8(pkcs8_slice.as_ref()).unwrap();
+    }
+
+    #[test]
+    fn test_add_transaction(){
+
+      let key_pair = generate_key_pair();
+      let created = Utc::now();
+      let uri = String::from("example.com");
+      let address = String::from("example.com");
+
+      let mut service = Service::new(address, Signer::new(key_pair, created, uri), None);
+      let result = service.add(
+        "example_contents",
+        "example_asset_ref",
+        "example_user_signature",
+        1,
+      );
+      // Check if the method returns an Ok result
+      assert!(result.is_ok());
+
+
+      let transaction = result.unwrap();
+      // Assert as needed
+    }
+  }
