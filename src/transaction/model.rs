@@ -9,17 +9,19 @@ use crate::{byte_helpers, compact_size};
 
 use std::error::Error;
 
+use crate::transaction::Transaction;
+
 #[derive(Debug, Clone)]
 pub struct Model {
-    id: String,
-    version: i32,
-    address: String,
-    timestamp: DateTime<Utc>,
-    asset_ref: String,
-    contents: String,
-    user_signature: String,
-    app_signature: String,
-    bytes: Vec<u8>,
+    pub id: String,
+    pub version: i32,
+    pub address: String,
+    pub timestamp: DateTime<Utc>,
+    pub asset_ref: String,
+    pub contents: String,
+    pub user_signature: String,
+    pub app_signature: String,
+    pub bytes: Vec<u8>,
 }
 
 impl Model{
@@ -36,7 +38,7 @@ impl Model{
     let contents = byte_helpers::base64_encode(&decoded[4]);
     let user_signature = byte_helpers::base64_encode(&decoded[5]);
     let app_signature = byte_helpers::base64_encode(&decoded[6]);
-    let id = Self::calculate_id(bytes);
+    let id = Transaction::calculate_id(bytes);
     Ok(Self {
         id,
         version,
