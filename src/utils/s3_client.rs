@@ -4,6 +4,7 @@
  */
 
 use std::error::Error;
+use std::env;
 use aws_config::BehaviorVersion;
 use aws_sdk_s3::Client;
 use md5::{Md5, Digest};
@@ -25,6 +26,20 @@ impl S3Client {
             bucket: bucket.to_string()
         }
     }
+
+    pub async fn new_from_env() -> Self {
+      let region = env::var("AWS_REGION").unwrap_or_default();
+      let bucket = env::var("AWS_BUCKET").unwrap_or_default();
+
+      let config = aws_config::defaults(BehaviorVersion::latest())
+          .region(aws_sdk_s3::config::Region::new(region))
+          .load()
+          .await;
+      Self {
+          s3: Client::new(&config),
+          bucket: bucket
+      }
+  }
 
     pub async fn read(
         &self,
