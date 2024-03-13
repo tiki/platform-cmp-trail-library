@@ -50,7 +50,7 @@ impl Model{
         app_signature,
         bytes: bytes.clone(),
     })
-}
+  }
 
   pub fn id(&self) -> &str {
     &self.id

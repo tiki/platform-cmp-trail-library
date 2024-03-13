@@ -20,7 +20,7 @@ pub struct Service{
 impl Service {
   
   pub fn add(
-    &self,
+    &mut self,
     contents: &str,
     asset_ref: &str,
     user_signature: &str,
@@ -61,7 +61,7 @@ impl Service {
           app_signature: byte_helpers::base64_encode(&app_signature),
           bytes,
       };
-      &self.transactions.push(transaction);
+      self.transactions.push(transaction.clone());
       return Ok(transaction);
   }
 

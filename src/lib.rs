@@ -8,6 +8,10 @@ pub use utils::*;
 
 mod block;
 pub use block::Block;
+
+mod transaction;
+pub use transaction::Model;
+
 mod signer;
 pub use signer::Signer;
 
