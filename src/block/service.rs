@@ -5,7 +5,6 @@
 
 use crate::compact_size;
 use crate::MerkleTree;
-use crate::Metadata;
 use super::{
     super::{byte_helpers, Owner, S3Client, transaction::Model as TxnModel},
     Model
@@ -64,13 +63,13 @@ impl Service {
           .for_each(|txn| bytes.append(&mut compact_size::encode(txn.clone())));
 
       let id = Self::calculate_id(&bytes);
-      let prevId = previous_id.to_string();
+      let prev_id = previous_id.to_string();
       client.write(&Self::path(owner, &id), &bytes).await?;
       let block = Model{
         id,
         version,
         timestamp,
-        previous_id: prevId,
+        previous_id: prev_id,
         transaction_root: byte_helpers::base64_encode(&transaction_root),
         transactions: transactions.clone(),
         bytes

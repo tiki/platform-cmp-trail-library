@@ -5,8 +5,7 @@
 
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use std::error::Error;
-use super::{ ModelSigner, super::{Owner, S3Client}};
+use super::{ ModelSigner, super::Owner};
 
 pub fn current_version() -> i32 { 1 }
 
