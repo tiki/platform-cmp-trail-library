@@ -6,8 +6,10 @@
 mod utils;
 pub use utils::*;
 
-mod block;
+pub mod block;
 pub use block::Block;
+pub use block::ModelTxn;
+
 mod signer;
 pub use signer::Signer;
 

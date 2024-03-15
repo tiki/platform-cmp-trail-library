@@ -4,7 +4,7 @@
  */
 
 mod model_txn;
-use model_txn::ModelTxn;
+pub use model_txn::ModelTxn;
 
 mod model;
 use model::Model;

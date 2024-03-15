@@ -5,7 +5,7 @@
 
 use std::error::Error;
 use chrono::{DateTime, Utc};
-use super::{ModelTxn, Model, super::{Signer, Owner, S3Client, byte_helpers}};
+use super::{ModelTxn, Model, super::{Signer, Owner, S3Client}};
 
 pub struct Service {
     id: Option<String>,
@@ -35,14 +35,15 @@ impl Service {
         user_signature: &str,
         signer: &Signer
     ) -> Result<&Self, Box<dyn Error>> {
-        let address = match self.owner.provider() {
-            None => byte_helpers::base64url_encode(&byte_helpers::utf8_encode( "mytiki.com")),
-            Some(provider) => { match self.owner.address() { 
-                None => byte_helpers::base64url_encode(&byte_helpers::utf8_encode(provider)), 
-                Some(address) => address.to_string() 
-            } } };
-        let txn = ModelTxn::new(&address, timestamp, asset_ref, contents, user_signature, signer)?;
-        self.transactions.push(txn);
+        let txn = ModelTxn::new(
+          timestamp,
+          asset_ref, 
+          contents,
+          user_signature,
+          &self.owner,
+          signer
+        );
+        self.transactions.push(txn?);
         Ok(self)
     }
 
@@ -50,7 +51,17 @@ impl Service {
         let block = Model::write(client, &self.owner, &self.previous_id, &self.transactions).await?;
         self.id = Some(block.id().to_string());
         self.timestamp = Some(block.timestamp());
+        self.transactions = block.transactions().clone();
         Ok(self)
+    }
+
+    pub async fn read(client: &S3Client, owner: &Owner, id: &str) -> Result<Self, Box<dyn Error>> {
+      let block = Model::read(client, owner, id).await?;
+      let mut new_block = Self::new(owner, block.previous_id());
+      new_block.id = Some(block.id().to_string());
+      new_block.timestamp = Some(block.timestamp());
+      new_block.transactions = block.transactions().clone();
+      Ok(new_block)
     }
 
     pub fn id(&self) -> &Option<String> { &self.id }

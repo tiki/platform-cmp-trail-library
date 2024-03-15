@@ -6,6 +6,9 @@
 use std::error::Error;
 use chrono::{DateTime, Utc};
 use num_bigint::BigInt;
+
+use crate::Owner;
+
 use super::super::{Signer, byte_helpers, compact_size};
 
 fn current_version() -> i32 { 2 }
@@ -26,18 +29,24 @@ pub struct ModelTxn {
 #[allow(unused)]
 impl ModelTxn {
     pub fn new(
-        address: &str, 
         timestamp: DateTime<Utc>,
         asset_ref: &str, 
         contents: &str,
         user_signature: &str,
+        owner: &Owner,
         signer: &Signer
     ) -> Result<Self, Box<dyn Error>> {
+      let address = match owner.provider() {
+        None => byte_helpers::base64url_encode(&byte_helpers::utf8_encode( "mytiki.com")),
+        Some(provider) => { match owner.address() { 
+            None => byte_helpers::base64url_encode(&byte_helpers::utf8_encode(provider)), 
+            Some(address) => address.to_string() 
+        } } };
         let mut bytes = Vec::<u8>::new();
         let version = current_version();
         let version_bigint = &BigInt::from(current_version());
         bytes.append(&mut compact_size::encode(byte_helpers::encode_bigint(version_bigint)));
-        bytes.append(&mut compact_size::encode(byte_helpers::base64url_decode(address)?));
+        bytes.append(&mut compact_size::encode(byte_helpers::base64url_decode(&address)?));
         let timestamp_bigint = &BigInt::from(timestamp.timestamp());
         bytes.append(&mut compact_size::encode(byte_helpers::encode_bigint(timestamp_bigint)));
         bytes.append(&mut compact_size::encode(byte_helpers::utf8_encode(asset_ref)));

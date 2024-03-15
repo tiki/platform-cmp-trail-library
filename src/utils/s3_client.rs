@@ -3,7 +3,7 @@
  * MIT license. See LICENSE file in root directory.
  */
 
-use std::error::Error;
+use std::{env, error::Error};
 use aws_config::BehaviorVersion;
 use aws_sdk_s3::Client;
 use md5::{Md5, Digest};
@@ -25,6 +25,19 @@ impl S3Client {
             bucket: bucket.to_string()
         }
     }
+
+    pub async fn from_env() -> Self {
+      let region = env::var("AWS_REGION").expect("$AWS_REGION is not set");
+      let bucket = env::var("AWS_BUCKET").expect("$AWS_USER is not set");
+      let config = aws_config::defaults(BehaviorVersion::latest())
+          .region(aws_sdk_s3::config::Region::new(String::from(region)))
+          .load()
+          .await;
+      Self {
+          s3: Client::new(&config),
+          bucket: bucket.to_string()
+      }
+  }
 
     pub async fn read(
         &self,
