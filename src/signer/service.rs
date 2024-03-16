@@ -9,13 +9,13 @@ use ring::rsa::KeyPair;
 use ring::signature;
 use super::{ Model, super::{Owner, S3Client, byte_helpers}};
 
+#[derive(Debug)]
 pub struct Service {
     key_pair: KeyPair,
     created: DateTime<Utc>,
     uri: String
 }
 
-#[allow(unused)]
 impl Service {
     pub async fn create(client: &S3Client, owner: &Owner, key: &str) -> Result<Self, Box<dyn Error>> {
         let path = Self::path(owner);

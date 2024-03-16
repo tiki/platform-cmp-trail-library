@@ -4,7 +4,7 @@
  */
 
 use std::{env, error::Error};
-use aws_config::BehaviorVersion;
+use aws_config::{BehaviorVersion, Region, meta::region::RegionProviderChain};
 use aws_sdk_s3::Client;
 use md5::{Md5, Digest};
 use super::byte_helpers::base64_encode;
@@ -26,18 +26,15 @@ impl S3Client {
         }
     }
 
-    pub async fn from_env() -> Self {
-      let region = env::var("AWS_REGION").expect("$AWS_REGION is not set");
-      let bucket = env::var("AWS_BUCKET").expect("$AWS_USER is not set");
-      let config = aws_config::defaults(BehaviorVersion::latest())
-          .region(aws_sdk_s3::config::Region::new(String::from(region)))
-          .load()
-          .await;
-      Self {
+    pub async fn from_env() -> Self { 
+        let region = RegionProviderChain::default_provider().or_else("us-east-2").region().await.unwrap();
+        let bucket = env::var("TIKI_BUCKET").expect("TIKI_BUCKET is not set");
+        let config = aws_config::defaults(BehaviorVersion::latest()).region(region).load().await;
+        Self {
           s3: Client::new(&config),
           bucket: bucket.to_string()
-      }
-  }
+        } 
+    }
 
     pub async fn read(
         &self,

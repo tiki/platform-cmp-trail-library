@@ -12,4 +12,6 @@ mod merkle_tree;
 pub use merkle_tree::MerkleTree;
 #[allow(unused)]
 mod s3_client;
+mod byte_serializer;
+
 pub use s3_client::S3Client;

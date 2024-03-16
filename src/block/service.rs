@@ -37,7 +37,7 @@ impl Service {
     ) -> Result<&Self, Box<dyn Error>> {
         let txn = ModelTxn::new(
           timestamp,
-          asset_ref, 
+          asset_ref,
           contents,
           user_signature,
           &self.owner,

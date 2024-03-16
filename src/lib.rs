@@ -3,8 +3,7 @@
  * MIT license. See LICENSE file in root directory.
  */
 
-mod utils;
-pub use utils::*;
+pub mod utils;
 
 pub mod block;
 pub use block::Block;
@@ -17,4 +16,6 @@ mod metadata;
 pub use metadata::Metadata;
 
 mod owner;
+mod transaction;
+
 pub use owner::Owner;
