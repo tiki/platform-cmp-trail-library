@@ -7,7 +7,6 @@ use super::super::{
     utils::{byte_helpers, compact_size},
     Signer,
 };
-use chrono::{DateTime, Utc};
 use num_bigint::BigInt;
 use std::error::Error;
 

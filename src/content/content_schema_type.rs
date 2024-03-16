@@ -4,9 +4,9 @@
  */
 
 #[derive(Debug, Clone, Eq, PartialEq)]
-pub enum ContentType { 
-    Title, 
-    License, 
-    Payable, 
-    Receipt 
+pub enum ContentSchemaType {
+    Title,
+    License,
+    Payable,
+    Receipt,
 }

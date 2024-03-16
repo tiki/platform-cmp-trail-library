@@ -5,10 +5,11 @@
 
 use super::{
     super::{
+        content::{Schema, Serializer},
         utils::{byte_helpers, compact_size},
         Owner, Signer,
     },
-    ContentSchema, ContentSerializer, TransactionModel,
+    TransactionModel,
 };
 use chrono::{DateTime, Utc};
 use num_bigint::BigInt;
@@ -17,20 +18,23 @@ use std::error::Error;
 #[derive(Debug, Clone)]
 pub struct TransactionService {
     id: String,
-    schema: ContentSchema,
+    schema: Schema,
     model: TransactionModel,
 }
 
 #[allow(unused)]
 impl TransactionService {
-    pub fn new<T: ContentSerializer>(
+    pub fn new<T>(
         owner: &Owner,
         parent: Option<String>,
-        schema: &ContentSchema,
+        schema: &Schema,
         contents: T,
         user_signature: &str,
         signer: &Signer,
-    ) -> Result<Self, Box<dyn Error>> {
+    ) -> Result<Self, Box<dyn Error>>
+    where
+        T: Serializer,
+    {
         let model = TransactionModel::new(
             &Self::calculate_address(owner),
             Utc::now().timestamp(),
@@ -50,7 +54,7 @@ impl TransactionService {
         &self.id
     }
 
-    pub fn schema(&self) -> &ContentSchema {
+    pub fn schema(&self) -> &Schema {
         &self.schema
     }
 
@@ -78,7 +82,10 @@ impl TransactionService {
         &self.model.asset_ref()
     }
 
-    pub fn contents<T: ContentSerializer>(&self) -> Result<T, Box<dyn Error>> {
+    pub fn contents<T>(&self) -> Result<T, Box<dyn Error>>
+    where
+        T: Serializer,
+    {
         let contents = byte_helpers::base64_decode(&self.model.contents())?;
         T::deserialize(&contents).map(|res| *res)
     }
@@ -91,7 +98,7 @@ impl TransactionService {
         let model = TransactionModel::from(bytes)?;
         let contents = byte_helpers::base64_decode(&model.contents())?;
         let contents = compact_size::decode(&contents);
-        let schema = ContentSchema::deserialize(&contents[0])?;
+        let schema = Schema::deserialize(&contents[0])?;
         Ok(Self {
             id: model.calculate_id(),
             schema,
@@ -116,7 +123,10 @@ impl TransactionService {
         }
     }
 
-    fn serialize_contents<T: ContentSerializer>(schema: &ContentSchema, contents: &T) -> String {
+    fn serialize_contents<T>(schema: &Schema, contents: &T) -> String
+    where
+        T: Serializer,
+    {
         let mut bytes: Vec<u8> = Vec::new();
         let schema_bigint = &BigInt::from(schema.schema());
         bytes.append(&mut compact_size::encode(byte_helpers::encode_bigint(

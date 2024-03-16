@@ -3,6 +3,7 @@
  * MIT license. See LICENSE file in root directory.
  */
 
+pub mod content;
 pub mod utils;
 
 pub mod block;
@@ -18,4 +19,4 @@ mod owner;
 pub use owner::Owner;
 
 mod transaction;
-pub use transaction::{ContentSchema, ContentType, Transaction};
+pub use transaction::Transaction;
