@@ -3,11 +3,8 @@
  * MIT license. See LICENSE file in root directory.
  */
 
-mod model_txn;
-pub use model_txn::ModelTxn;
+mod block_model;
+use block_model::BlockModel;
 
-mod model;
-use model::Model;
-
-mod service;
-pub use service::Service as Block;
+mod block_service;
+pub use block_service::BlockService as Block;

@@ -14,12 +14,14 @@ use chrono::{DateTime, Utc};
 use num_bigint::BigInt;
 use std::error::Error;
 
+#[derive(Debug, Clone)]
 pub struct TransactionService {
     id: String,
     schema: ContentSchema,
     model: TransactionModel,
 }
 
+#[allow(unused)]
 impl TransactionService {
     pub fn new<T: ContentSerializer>(
         owner: &Owner,
