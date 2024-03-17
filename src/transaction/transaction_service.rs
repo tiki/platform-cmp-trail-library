@@ -6,7 +6,7 @@
 use super::{
     super::{
         content::{Schema, Serializer},
-        utils::{byte_helpers, compact_size},
+        utils::{byte_helpers, compact_size, SqsClient},
         Owner, Signer,
     },
     TransactionModel,
@@ -24,7 +24,8 @@ pub struct TransactionService {
 
 #[allow(unused)]
 impl TransactionService {
-    pub fn new<T>(
+    pub async fn new<T>(
+        client: &SqsClient,
         owner: &Owner,
         parent: Option<String>,
         schema: &Schema,
@@ -35,14 +36,16 @@ impl TransactionService {
     where
         T: Serializer,
     {
-        let model = TransactionModel::new(
-            &Self::calculate_address(owner),
+        let model = TransactionModel::submit(
+            client,
+            owner,
             Utc::now().timestamp(),
             &Self::calculate_asset_ref(parent),
-            &Self::serialize_contents(schema, &contents),
+            &Self::serialize_contents(schema, &contents)?,
             user_signature,
             signer,
-        )?;
+        )
+        .await?;
         Ok(Self {
             id: model.calculate_id(),
             schema: schema.clone(),
@@ -106,16 +109,6 @@ impl TransactionService {
         })
     }
 
-    fn calculate_address(owner: &Owner) -> String {
-        match owner.provider() {
-            None => byte_helpers::base64url_encode(&byte_helpers::utf8_encode("mytiki.com")),
-            Some(provider) => match owner.address() {
-                None => byte_helpers::base64url_encode(&byte_helpers::utf8_encode(provider)),
-                Some(address) => address.to_string(),
-            },
-        }
-    }
-
     fn calculate_asset_ref(parent: Option<String>) -> String {
         match parent {
             Some(parent) => format!("txn:://{}", parent),
@@ -123,7 +116,7 @@ impl TransactionService {
         }
     }
 
-    fn serialize_contents<T>(schema: &Schema, contents: &T) -> String
+    fn serialize_contents<T>(schema: &Schema, contents: &T) -> Result<String, Box<dyn Error>>
     where
         T: Serializer,
     {
@@ -132,7 +125,7 @@ impl TransactionService {
         bytes.append(&mut compact_size::encode(byte_helpers::encode_bigint(
             schema_bigint,
         )));
-        bytes.append(&mut compact_size::encode(contents.serialize()));
-        byte_helpers::base64_encode(&bytes)
+        bytes.append(&mut compact_size::encode(contents.serialize()?));
+        Ok(byte_helpers::base64_encode(&bytes))
     }
 }

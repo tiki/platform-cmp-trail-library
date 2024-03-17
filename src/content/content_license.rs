@@ -5,12 +5,14 @@
 
 use super::{
     super::utils::{byte_helpers, compact_size},
-    Serializer, Tag,
+    Serializer, Tag, Use,
 };
+use chrono::{DateTime, Utc};
+use num_bigint::BigInt;
 use std::error::Error;
 
 pub struct ContentLicense {
-    uses: Vec<UseCase>,
+    uses: Vec<Use>,
     terms: String,
     description: Option<String>,
     expiry: Option<DateTime<Utc>>,
@@ -18,7 +20,7 @@ pub struct ContentLicense {
 
 impl ContentLicense {
     pub fn new(
-        uses: Vec<UseCase>,
+        uses: Vec<Use>,
         terms: &str,
         description: Option<String>,
         expiry: Option<DateTime<Utc>>,
@@ -31,7 +33,7 @@ impl ContentLicense {
         }
     }
 
-    pub fn uses(&self) -> &Vec<UseCase> {
+    pub fn uses(&self) -> &Vec<Use> {
         &self.uses
     }
 
@@ -49,7 +51,7 @@ impl ContentLicense {
 }
 
 impl Serializer for ContentLicense {
-    fn serialize(&self) -> Vec<u8> {
+    fn serialize(&self) -> Result<Vec<u8>, Box<dyn Error>> {
         let mut bytes = Vec::<u8>::new();
         let uses = serde_json::to_string(&self.uses)?;
         bytes.append(&mut compact_size::encode(byte_helpers::utf8_encode(&uses)));
@@ -92,11 +94,11 @@ impl Serializer for ContentLicense {
         } else {
             DateTime::from_timestamp(expiry.to_string().parse::<i64>()?, 0)
         };
-        Ok(Self {
+        Ok(Box::new(Self {
             uses,
             terms,
             description,
             expiry,
-        })
+        }))
     }
 }

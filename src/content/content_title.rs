@@ -44,7 +44,7 @@ impl ContentTitle {
 }
 
 impl Serializer for ContentTitle {
-    fn serialize(&self) -> Vec<u8> {
+    fn serialize(&self) -> Result<Vec<u8>, Box<dyn Error>> {
         let mut bytes = Vec::<u8>::new();
         let tags = serde_json::to_string(&self.tags)?;
         bytes.append(&mut compact_size::encode(byte_helpers::utf8_encode(

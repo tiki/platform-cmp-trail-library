@@ -29,3 +29,6 @@ pub use content_title::ContentTitle as Title;
 
 mod content_license;
 pub use content_license::ContentLicense as License;
+
+mod content_use;
+pub use content_use::ContentUse as Use;

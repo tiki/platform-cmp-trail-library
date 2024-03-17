@@ -4,8 +4,9 @@
  */
 
 use super::super::{
-    utils::{byte_helpers, compact_size},
-    Signer,
+    utils::{byte_helpers, compact_size, SqsClient},
+    writer::{BodyTransaction, Group},
+    Owner, Signer,
 };
 use num_bigint::BigInt;
 use std::error::Error;
@@ -27,8 +28,9 @@ pub struct TransactionModel {
 }
 
 impl TransactionModel {
-    pub fn new(
-        address: &str,
+    pub async fn submit(
+        client: &SqsClient,
+        owner: &Owner,
         timestamp: i64,
         asset_ref: &str,
         contents: &str,
@@ -40,6 +42,7 @@ impl TransactionModel {
         bytes.append(&mut compact_size::encode(byte_helpers::encode_bigint(
             &BigInt::from(version),
         )));
+        let address = Self::calculate_address(owner);
         bytes.append(&mut compact_size::encode(byte_helpers::base64url_decode(
             &address,
         )?));
@@ -58,9 +61,13 @@ impl TransactionModel {
         let app_signature = signer.sign(&bytes)?;
         bytes.append(&mut compact_size::encode(app_signature.clone()));
 
+        let group = Group::new_txn(owner)?;
+        let body = BodyTransaction::default().add_transaction(&bytes);
+        client.send(&group.to_string(), &body).await?;
+
         Ok(Self {
             version,
-            address: address.to_string(),
+            address,
             timestamp,
             asset_ref: asset_ref.to_string(),
             contents: contents.to_string(),
@@ -127,5 +134,15 @@ impl TransactionModel {
 
     pub fn calculate_id(&self) -> String {
         byte_helpers::base64url_encode(&byte_helpers::sha3(&self.bytes))
+    }
+
+    fn calculate_address(owner: &Owner) -> String {
+        match owner.provider() {
+            None => byte_helpers::base64url_encode(&byte_helpers::utf8_encode("mytiki.com")),
+            Some(provider) => match owner.address() {
+                None => byte_helpers::base64url_encode(&byte_helpers::utf8_encode(provider)),
+                Some(address) => address.to_string(),
+            },
+        }
     }
 }
