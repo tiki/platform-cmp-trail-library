@@ -32,3 +32,6 @@ pub use content_license::ContentLicense as License;
 
 mod content_use;
 pub use content_use::ContentUse as Use;
+
+mod content_empty;
+pub use content_empty::ContentEmpty as Empty;

@@ -19,6 +19,10 @@ pub struct ContentSchema {
 impl ContentSchema {
     pub fn new(schema: u16) -> Result<Self, Box<dyn Error>> {
         match schema {
+            0 => Ok(Self {
+                typ: SchemaType::Empty,
+                schema: 2,
+            }),
             2 => Ok(Self {
                 typ: SchemaType::Title,
                 schema: 2,
@@ -39,24 +43,34 @@ impl ContentSchema {
         }
     }
 
+    pub fn empty() -> Self {
+        Self {
+            typ: SchemaType::Title,
+            schema: 0,
+        }
+    }
+
     pub fn title() -> Self {
         Self {
             typ: SchemaType::Title,
             schema: 2,
         }
     }
+
     pub fn license() -> Self {
         Self {
             typ: SchemaType::License,
             schema: 3,
         }
     }
+
     pub fn payable() -> Self {
         Self {
             typ: SchemaType::Payable,
             schema: 4,
         }
     }
+
     pub fn receipt() -> Self {
         Self {
             typ: SchemaType::Receipt,
@@ -83,6 +97,7 @@ impl ContentSchema {
     pub fn typ(&self) -> &SchemaType {
         &self.typ
     }
+
     pub fn schema(&self) -> u16 {
         self.schema
     }

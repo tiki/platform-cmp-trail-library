@@ -8,6 +8,7 @@ use super::super::{
     writer::{BodyTransaction, Group},
     Owner, Signer,
 };
+use chrono::Utc;
 use num_bigint::BigInt;
 use std::error::Error;
 
@@ -28,8 +29,7 @@ pub struct TransactionModel {
 }
 
 impl TransactionModel {
-    pub async fn submit(
-        client: &SqsClient,
+    pub fn new(
         owner: &Owner,
         timestamp: i64,
         asset_ref: &str,
@@ -61,10 +61,6 @@ impl TransactionModel {
         let app_signature = signer.sign(&bytes)?;
         bytes.append(&mut compact_size::encode(app_signature.clone()));
 
-        let group = Group::new_txn(owner)?;
-        let body = BodyTransaction::default().add_transaction(&bytes);
-        client.send(&group.to_string(), &body).await?;
-
         Ok(Self {
             version,
             address,
@@ -75,6 +71,12 @@ impl TransactionModel {
             app_signature: byte_helpers::base64_encode(&app_signature),
             bytes,
         })
+    }
+
+    pub async fn submit(&self, client: &SqsClient, owner: &Owner) -> Result<(), Box<dyn Error>> {
+        let group = Group::new_txn(owner)?;
+        let body = BodyTransaction::default().add_transaction(&self.bytes);
+        client.send(&group.to_string(), &body).await
     }
 
     pub fn from(bytes: &Vec<u8>) -> Result<Self, Box<dyn Error>> {

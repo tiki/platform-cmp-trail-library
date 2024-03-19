@@ -24,8 +24,7 @@ pub struct TransactionService {
 
 #[allow(unused)]
 impl TransactionService {
-    pub async fn new<T>(
-        client: &SqsClient,
+    pub fn new<T>(
         owner: &Owner,
         parent: Option<String>,
         schema: &Schema,
@@ -36,21 +35,23 @@ impl TransactionService {
     where
         T: Serializer,
     {
-        let model = TransactionModel::submit(
-            client,
+        let model = TransactionModel::new(
             owner,
             Utc::now().timestamp(),
             &Self::calculate_asset_ref(parent),
             &Self::serialize_contents(schema, &contents)?,
             user_signature,
             signer,
-        )
-        .await?;
+        )?;
         Ok(Self {
             id: model.calculate_id(),
             schema: schema.clone(),
             model,
         })
+    }
+
+    pub async fn submit(&self, client: &SqsClient, owner: &Owner) -> Result<(), Box<dyn Error>> {
+        self.model.submit(client, owner).await
     }
 
     pub fn id(&self) -> &str {

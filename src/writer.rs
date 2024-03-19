@@ -11,3 +11,6 @@ pub use writer_group_type::WriterGroupType as GroupType;
 
 mod writer_body_transaction;
 pub use writer_body_transaction::WriterBodyTransaction as BodyTransaction;
+
+mod writer_body_initialize;
+pub use writer_body_initialize::WriterBodyInitialize as BodyInitialize;

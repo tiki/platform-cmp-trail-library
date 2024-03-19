@@ -5,6 +5,7 @@
 
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub enum ContentSchemaType {
+    Empty,
     Title,
     License,
     Payable,

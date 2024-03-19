@@ -14,6 +14,19 @@ pub struct WriterGroup {
 
 #[allow(unused)]
 impl WriterGroup {
+    pub fn new(group: &str) -> Result<Self, Box<dyn Error>> {
+        let split = group.split_once(':').unwrap_or((group, ""));
+        let typ = match split.0 {
+            "init" => GroupType::Initialize,
+            "txn" => GroupType::Transaction,
+            _ => return Err("invalid group type")?,
+        };
+        Ok(Self {
+            typ,
+            id: split.1.to_string(),
+        })
+    }
+
     pub fn new_txn(owner: &Owner) -> Result<Self, Box<dyn Error>> {
         let provider = owner.provider().clone().ok_or("No provider")?;
         match owner.address() {
