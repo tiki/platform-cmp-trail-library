@@ -3,11 +3,11 @@
  * MIT license. See LICENSE file in root directory.
  */
 
-mod model;
-use model::Model;
+mod metadata_model;
+use metadata_model::MetadataModel;
 
-mod model_signer;
-use model_signer::ModelSigner;
+mod metadata_model_signer;
+use metadata_model_signer::MetadataModelSigner;
 
-mod service;
-pub use service::Service as Metadata;
+mod metadata_service;
+pub use metadata_service::MetadataService as Metadata;

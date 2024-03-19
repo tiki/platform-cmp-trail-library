@@ -3,8 +3,8 @@
  * MIT license. See LICENSE file in root directory.
  */
 
-mod model;
-use model::Model;
+mod signer_model;
+use signer_model::SignerModel;
 
-mod service;
-pub use service::Service as Signer;
+mod signer_service;
+pub use signer_service::SignerService as Signer;

@@ -12,9 +12,14 @@ pub struct Owner {
     address: Option<String>,
 }
 
-#[allow(unused)]
 impl Owner {
-    pub fn new(provider: Option<String>, address: Option<String>) -> Self { Self { provider, address } }
-    pub fn provider(&self) -> &Option<String> { &self.provider }
-    pub fn address(&self) -> &Option<String> { &self.address }
+    pub fn new(provider: Option<String>, address: Option<String>) -> Self {
+        Self { provider, address }
+    }
+    pub fn provider(&self) -> &Option<String> {
+        &self.provider
+    }
+    pub fn address(&self) -> &Option<String> {
+        &self.address
+    }
 }
