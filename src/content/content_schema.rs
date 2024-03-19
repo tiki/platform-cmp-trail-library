@@ -12,7 +12,7 @@ use std::error::Error;
 
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct ContentSchema {
-    typ: ContentSchemaType,
+    typ: SchemaType,
     schema: u16,
 }
 
@@ -20,19 +20,19 @@ impl ContentSchema {
     pub fn new(schema: u16) -> Result<Self, Box<dyn Error>> {
         match schema {
             2 => Ok(Self {
-                typ: ContentSchemaType::Title,
+                typ: SchemaType::Title,
                 schema: 2,
             }),
             3 => Ok(Self {
-                typ: ContentSchemaType::License,
+                typ: SchemaType::License,
                 schema: 3,
             }),
             4 => Ok(Self {
-                typ: ContentSchemaType::Payable,
+                typ: SchemaType::Payable,
                 schema: 4,
             }),
             5 => Ok(Self {
-                typ: ContentSchemaType::Receipt,
+                typ: SchemaType::Receipt,
                 schema: 5,
             }),
             _ => Err("Unknown schema".into()),
@@ -41,25 +41,25 @@ impl ContentSchema {
 
     pub fn title() -> Self {
         Self {
-            typ: ContentSchemaType::Title,
+            typ: SchemaType::Title,
             schema: 2,
         }
     }
     pub fn license() -> Self {
         Self {
-            typ: ContentSchemaType::License,
+            typ: SchemaType::License,
             schema: 3,
         }
     }
     pub fn payable() -> Self {
         Self {
-            typ: ContentSchemaType::Payable,
+            typ: SchemaType::Payable,
             schema: 4,
         }
     }
     pub fn receipt() -> Self {
         Self {
-            typ: ContentSchemaType::Receipt,
+            typ: SchemaType::Receipt,
             schema: 5,
         }
     }
@@ -80,7 +80,7 @@ impl ContentSchema {
         Ok(schema)
     }
 
-    pub fn typ(&self) -> &ContentSchemaType {
+    pub fn typ(&self) -> &SchemaType {
         &self.typ
     }
     pub fn schema(&self) -> u16 {

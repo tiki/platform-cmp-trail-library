@@ -4,8 +4,8 @@
  */
 
 use super::{
-    super::{utils::S3Client, Owner, Signer},
-    BlockModel, ModelTxn,
+    super::{utils::S3Client, Owner, Signer, Transaction},
+    BlockModel,
 };
 use chrono::{DateTime, Utc};
 use std::error::Error;
@@ -16,7 +16,7 @@ pub struct BlockService {
     owner: Owner,
     previous_id: String,
     timestamp: Option<DateTime<Utc>>,
-    transactions: Vec<ModelTxn>,
+    transactions: Vec<Transaction>,
 }
 
 #[allow(unused)]
@@ -31,23 +31,8 @@ impl BlockService {
         }
     }
 
-    pub fn add(
-        &mut self,
-        timestamp: DateTime<Utc>,
-        asset_ref: &str,
-        contents: &str,
-        user_signature: &str,
-        signer: &Signer,
-    ) -> Result<&Self, Box<dyn Error>> {
-        let txn = ModelTxn::new(
-            timestamp,
-            asset_ref,
-            contents,
-            user_signature,
-            &self.owner,
-            signer,
-        );
-        self.transactions.push(txn?);
+    pub fn add(&mut self, transaction: &Transaction) -> Result<&Self, Box<dyn Error>> {
+        self.transactions.push(transaction.clone());
         Ok(self)
     }
 
@@ -81,7 +66,7 @@ impl BlockService {
     pub fn timestamp(&self) -> Option<DateTime<Utc>> {
         self.timestamp
     }
-    pub fn transactions(&self) -> &Vec<ModelTxn> {
+    pub fn transactions(&self) -> &Vec<Transaction> {
         &self.transactions
     }
 }
