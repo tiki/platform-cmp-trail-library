@@ -91,7 +91,8 @@ impl TransactionService {
         T: Serializer,
     {
         let contents = byte_helpers::base64_decode(&self.model.contents())?;
-        T::deserialize(&contents).map(|res| *res)
+        let contents = compact_size::decode(&contents);
+        T::deserialize(&contents[1]).map(|res| *res)
     }
 
     pub fn serialize(&self) -> &Vec<u8> {
